@@ -1,5 +1,7 @@
 import scala.io.Source
 
+
+
 sealed trait Indices
 case class RowIndices(indices: List[List[Int]]) extends Indices
 case class ColIndices(indices: List[List[Int]]) extends Indices

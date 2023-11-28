@@ -1,30 +1,46 @@
 object Gpossib {
   
-  def generatePossibilities(size: Int,line: List[Int] ): List[List[Int]] = {
-    val solution: List[String] = generatePossibilitiesHelper(line, size)
+      def produceCombinations(line: List[Int], size: Int, matrix: Array[Int]): List[List[Int]] = {
+        val solution: List[String] = combinationHelper(line, size)
 
-    val allValues: List[List[Int]] = solution.map { elem =>
-      elem.map(num => num.toInt - 48).toList
+        val allValues: List[List[Int]] = solution.map { elem =>
+            elem.map(num => num.toInt - 48).toList
+        }
+
+        println("Je print allValues " + allValues)
+        println("Je print la matrix " + matrix.toList)
+
+        val onePositions = getOnePositions(matrix)
+
+        val filteredValues = allValues.filter(combination => hasSamePositionsAsMatrix(combination, onePositions))
+
+        filteredValues
     }
 
-    allValues
-  }
-
-  def generatePossibilitiesHelper(line: List[Int], size: Int): List[String] = {
-    if (line.isEmpty) List("0" * size)
-    else if (line.head > size) List()
-    else {
-      val starts: Int = size - line.head
-
-      if (line.length == 1) {
-        (0 to starts).map(i => "0" * i + "1" * line.head + "0" * (starts - i)).toList
-      } else {
-        (0 until size - line.head).flatMap { i =>
-          generatePossibilitiesHelper(line.tail, starts - i - 1).map(sol => "0" * i + "1" * line.head + "0" + sol)
-        }.toList
-      }
+    def getOnePositions(matrix: Array[Int]): List[Int] = {
+        matrix.zipWithIndex.collect { case (value, index) if value == 1 => index }.toList
     }
-  }
+
+    def hasSamePositionsAsMatrix(lst: List[Int], positions: List[Int]): Boolean = {
+        positions.forall(index => lst(index) == 1)
+    }
+
+
+    def combinationHelper(line: List[Int], size: Int): List[String] = {
+        if (line.isEmpty) List("0" * size)
+        else if (line.head > size) List()
+        else {
+            val starts: Int = size - line.head
+
+            if (line.length == 1) {
+            (0 to starts).map(i => "0" * i + "1" * line.head + "0" * (starts - i)).toList
+            } else {
+            (0 until size - line.head).flatMap { i =>
+                combinationHelper(line.tail, starts - i - 1).map(sol => "0" * i + "1" * line.head + "0" + sol)
+            }.toList
+            }
+        }
+    }
 
 
 
@@ -38,7 +54,7 @@ object Gpossib {
 
 
   def main(args: Array[String]): Unit = {
-    println("Possibilités pour (10, List(1,1)):")
+    /*println("Possibilités pour (10, List(1,1)):")
     val possibilities1 = generatePossibilities(10, List(1, 1))
     printPossibilities(possibilities1)
     
@@ -60,6 +76,6 @@ object Gpossib {
 
     println("\nPossibilités pour (8, List(2,1,1)):")
     val possibilities6 = generatePossibilities(8, List(2, 1,1))
-    printPossibilities(possibilities6)
+    printPossibilities(possibilities6)*/
   }
 }

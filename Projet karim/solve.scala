@@ -1,8 +1,7 @@
 import scala.io.Source
 import scala.annotation.tailrec
-import MatrixProcessor._
 import Gpossib._
-
+import MatrixProcessor._
 
 object solver {
 
@@ -15,7 +14,7 @@ object solver {
   val numCols = colHints.length
 
   
-  val initialBoard = generateBoardCombinations(numCols, rowHints)
+  val initialBoard = generateBoardCombinations(numCols, rowHints, colHints)
 
   def solveRec(board: Board, rowIndex: Int): Option[Board] = {
     if (rowIndex == numRows) {
@@ -27,7 +26,7 @@ object solver {
         None
       }
     } else {
-      val rowPossibilities = generatePossibilities(numCols, rowHints(rowIndex))
+      val rowPossibilities = generatePossibilities(numCols, rowHints(rowIndex)) //Generate possibilities
       val updatedBoard = rowPossibilities.foldLeft(Option.empty[Board]) { (acc, possibility) =>
         acc.orElse {
           val newBoard = updateBoardRow(board, rowIndex, possibility)
@@ -49,26 +48,138 @@ object solver {
   solveRec(initialBoard, 0)
 }
 
+  def generateBoardCombinations(size: Int, rowHints: List[Row], colHints: List[Col]): Board = {
+    val numRows = rowHints.size
+    val numCols = size
+    
+    //Initialisé Start ici
 
+    //val emptyBoard: Board = List.fill(numRows)(List.fill(numCols)(false))
 
+    val emptyBoard = Array.ofDim[Int](numRows, numCols)
+    val startBoard = start(rowHints, colHints, emptyBoard)
 
-   def generateBoardCombinations(size: Int, rowHints: List[Row]): Board = {
-  val numRows = rowHints.size
-  val numCols = size
-    val emptyBoard: Board = List.fill(numRows)(List.fill(numCols)(false))
-  draw(emptyBoard)
-  val rowPossibilities = rowHints.map(hints => generatePossibilities(numCols, hints).head)
+    draw(startBoard)
 
+    val rowPossibilities = rowHints.map(hints => produceCombinations(numCols, hints).head)
 
-
-  rowPossibilities.zipWithIndex.foldLeft(emptyBoard) {
+    rowPossibilities.zipWithIndex.foldLeft(emptyBoard) {
     case (board, (possibility, rowIndex)) =>
       updateBoardRow(board, rowIndex, possibility)
 
   }
 }
 
-  
+  def start(rowIndices: List[List[Int]], colIndices: List[List[Int]], matrix: Array[Array[Int]]): List[List[Int]] = { //Fonction pour remplir les hint plus grand que la moitié
+      for (i <- 0 until rowIndices.length) { //Pour chaque ligne
+          val list = rowIndices(i) //Liste des indices de la lignes
+          //println("Je print la liste : " + list.length)
+          //println("Je print rowIndices : " + rowIndices(i))
+
+          val IndicesSum = list.sum //Somme des indices de la ligne
+          val IndicesCases = IndicesSum + (list.length - 1)
+          val EmptyCase = rowIndices.length - IndicesCases //Nombre de cases vides dans la ligne
+
+          //println("Je print la somme des indices : " + EmptyCase)
+
+          if(EmptyCase == 0) {
+              var counter = 0
+              var k = 0
+              var skip = false
+              for (j <- 0 until rowIndices.length) {
+                  if(skip) {
+                    skip = false
+                  } else {
+                    matrix(i)(j) = 1
+                    counter = counter + 1
+
+                    if(counter == list(k) && j + 1 != rowIndices.length) {
+                        matrix(i)(j+1) = 2
+                        counter = 0
+                        k = k + 1
+                        skip = true
+                    }
+                  }
+              }
+          } else { //Vérifier que les éléments de la liste sont plus grand que EmptyCase, pour ça on itère sur tout le tableau, compteur sur la liste
+              var counter = 0
+              var index = 0
+
+              if(list(counter) > EmptyCase) {
+                  //val case = list(counter) - EmptyCase //Nombre de case à colorier -> 6 - 2 = 4 bloc à colorier
+
+                  for(k <- counter until list(counter)) {
+                    if(k < EmptyCase) {
+                      //matrix(i)(k) = 0
+                      counter = counter + 1
+                    } else {
+                      matrix(i)(k) = 1 
+                      counter = counter + 1
+                    } 
+                  }
+              }
+          }
+      }////
+
+      for (i <- 0 until colIndices.length) { //Pour chaque ligne
+          val list = colIndices(i) //Liste des indices de la lignes
+          //println("Je print la liste : " + list.length)
+          //println("Je print colIndices : " + colIndices(i))
+
+          val IndicesSum = list.sum //Somme des indices de la ligne
+          val IndicesCases = IndicesSum + (list.length - 1)
+          val EmptyCase = colIndices.length - IndicesCases //Nombre de cases vides dans la ligne
+
+          //println("Je print la somme des indices : " + EmptyCase)
+
+          if(EmptyCase == 0) {
+              var counter = 0
+              var k = 0
+              var skip = false
+              for (j <- 0 until colIndices.length) {
+                  if(skip) {
+                    skip = false
+                  } else {
+                    matrix(j)(i) = 1
+                    counter = counter + 1
+
+                    if(counter == list(k) && j + 1 != colIndices.length) {
+                        matrix(j+1)(i) = 2
+                        counter = 0
+                        k = k + 1
+                        skip = true
+                    }
+                  }
+              }
+          } else { //Vérifier que les éléments de la liste sont plus grand que EmptyCase, pour ça on itère sur tout le tableau, compteur sur la liste
+              var counter = 0
+              var index = 0
+
+              if(list(counter) > EmptyCase) {
+                  //val case = list(counter) - EmptyCase //Nombre de case à colorier -> 6 - 2 = 4 bloc à colorier
+
+                  for(k <- counter until list(counter)) {
+                    if(k < EmptyCase) {
+                      //matrix(i)(k) = 0
+                      counter = counter + 1
+                    } else {
+                      matrix(k)(i) = 1 
+                      counter = counter + 1
+                    } 
+                  }
+              }
+          }
+      }
+      println("J'essaye de print la matrice start:")
+      for (i <- 0 until matrix.length) {
+        for (j <- 0 until matrix(i).length) {
+        print(matrix(i)(j) + " ")
+        } 
+        println()
+      }
+      val matrixAsList: List[List[Int]] = matrix.map(_.toList).toList
+      matrixAsList
+  }
 
   // Fonction pour mettre à jour une ligne de la matrice avec une possibilité donnée
   def updateBoardRow(board: Board, rowIndex: Int, rowPossibility: List[Int]): Board = {

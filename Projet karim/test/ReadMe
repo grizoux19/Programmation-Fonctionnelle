@@ -1,0 +1,7 @@
+Pour donner le schéma de ma grille , il faut aller dans le fichier texte : "matrice.txt". 
+
+Pour les cases ou on souhaite avoir un point : il faut mettre un O.
+Pour les cases vides : il faut mettre un X.
+Le programme vous indiquera si jamais il y a une erreur de format. 
+
+Pour lancer le programme , il faut taper dans la console : scala hints.scala 
