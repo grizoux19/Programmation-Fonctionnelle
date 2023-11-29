@@ -60,11 +60,11 @@ object solver {
   val numCols = size
     val emptyBoard: Board = List.fill(numRows)(List.fill(numCols)(false))
   draw(emptyBoard)
-  val rowPossibilities = rowHints.map(hints => generatePossibilities(numCols, hints).head)
+  val rowPossibilities = rowHints.map(hints => generatePossibilities(numCols, hints).head) // Tablezu qui contient les première possibilité
 
 
 
-  rowPossibilities.zipWithIndex.foldLeft(emptyBoard) {
+  rowPossibilities.zipWithIndex.foldLeft(emptyBoard) { //Ecrit rowpossibilities dans 
     case (board, (possibility, rowIndex)) =>
       updateBoardRow(board, rowIndex, possibility)
 

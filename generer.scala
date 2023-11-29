@@ -51,7 +51,7 @@ object NonogramHelper {
 
 
 
-    def produceCombinations(line: List[Int], size: Int, matrix: Array[Int]): List[List[Int]] = {
+    def produceCombinations(line: List[Int], size: Int, matrix: List[Int]): List[List[Int]] = {
         val solution: List[String] = combinationHelper(line, size)
 
         val allValues: List[List[Int]] = solution.map { elem =>
@@ -68,8 +68,8 @@ object NonogramHelper {
         filteredValues
     }
 
-    def getOnePositions(matrix: Array[Int]): List[Int] = {
-        matrix.zipWithIndex.collect { case (value, index) if value == 1 => index }.toList
+    def getOnePositions(matrix: List[Int]): List[Int] = {
+        matrix.zipWithIndex.collect { case (value, index) if value == 1 => index }
     }
 
     def hasSamePositionsAsMatrix(lst: List[Int], positions: List[Int]): Boolean = {
@@ -94,111 +94,115 @@ object NonogramHelper {
     }
 
 
-def start(rowIndices: List[List[Int]], colIndices: List[List[Int]], matrix: List[List[Int]]): Boolean = {
-  // ... (Votre code inchangé jusqu'à la première boucle for)
+      def start(rowIndices: List[List[Int]], colIndices: List[List[Int]], matrix: Array[Array[Int]]): Boolean = { //Fonction pour remplir les hint plus grand que la moitié
+        for (i <- 0 until rowIndices.length) { //Pour chaque ligne
+            val list = rowIndices(i) //Liste des indices de la lignes
+            //println("Je print la liste : " + list.length)
+            //println("Je print rowIndices : " + rowIndices(i))
 
-  for ((rowList, rowIndex) <- rowIndices.zipWithIndex) {
-    val indicesSum = rowList.sum
-    val indicesCases = indicesSum + (rowList.length - 1)
-    val emptyCase = matrix.length - indicesCases
+            val IndicesSum = list.sum //Somme des indices de la ligne
+            val IndicesCases = IndicesSum + (list.length - 1)
+            val EmptyCase = rowIndices.length - IndicesCases //Nombre de cases vides dans la ligne
 
-    if (emptyCase == 0) {
-      var counter = 0
-      var k = 0
-      var skip = false
-      matrix = matrix.updated(rowIndex, matrix(rowIndex).updated(0, 1))
-      for (j <- 0 until matrix.length) {
-        if (skip) {
-          skip = false
-        } else {
-          matrix = matrix.updated(rowIndex, matrix(rowIndex).updated(j, 1))
-          counter = counter + 1
+            //println("Je print la somme des indices : " + EmptyCase)
 
-          if (counter == rowList(k) && j + 1 != matrix.length) {
-            matrix = matrix.updated(rowIndex, matrix(rowIndex).updated(j + 1, 2))
-            counter = 0
-            k = k + 1
-            skip = true
-          }
+            if(EmptyCase == 0) {
+                var counter = 0
+                var k = 0
+                var skip = false
+                for (j <- 0 until rowIndices.length) {
+                    if(skip) {
+                      skip = false
+                    } else {
+                      matrix(i)(j) = 1
+                      counter = counter + 1
+
+                      if(counter == list(k) && j + 1 != rowIndices.length) {
+                          matrix(i)(j+1) = 2
+                          counter = 0
+                          k = k + 1
+                          skip = true
+                      }
+                    }
+                }
+            } else { //Vérifier que les éléments de la liste sont plus grand que EmptyCase, pour ça on itère sur tout le tableau, compteur sur la liste
+                var counter = 0
+                var index = 0
+
+                if(list(counter) > EmptyCase) {
+                    //val case = list(counter) - EmptyCase //Nombre de case à colorier -> 6 - 2 = 4 bloc à colorier
+
+                    for(k <- counter until list(counter)) {
+                      if(k < EmptyCase) {
+                        //matrix(i)(k) = 0
+                        counter = counter + 1
+                      } else {
+                        matrix(i)(k) = 1 
+                        counter = counter + 1
+                      } 
+                    }
+                }
+            }
+        }////
+
+        for (i <- 0 until colIndices.length) { //Pour chaque ligne
+            val list = colIndices(i) //Liste des indices de la lignes
+            //println("Je print la liste : " + list.length)
+            //println("Je print colIndices : " + colIndices(i))
+
+            val IndicesSum = list.sum //Somme des indices de la ligne
+            val IndicesCases = IndicesSum + (list.length - 1)
+            val EmptyCase = colIndices.length - IndicesCases //Nombre de cases vides dans la ligne
+
+            //println("Je print la somme des indices : " + EmptyCase)
+
+            if(EmptyCase == 0) {
+                var counter = 0
+                var k = 0
+                var skip = false
+                for (j <- 0 until colIndices.length) {
+                    if(skip) {
+                      skip = false
+                    } else {
+                      matrix(j)(i) = 1
+                      counter = counter + 1
+
+                      if(counter == list(k) && j + 1 != colIndices.length) {
+                          matrix(j+1)(i) = 2
+                          counter = 0
+                          k = k + 1
+                          skip = true
+                      }
+                    }
+                }
+            } else { //Vérifier que les éléments de la liste sont plus grand que EmptyCase, pour ça on itère sur tout le tableau, compteur sur la liste
+                var counter = 0
+                var index = 0
+
+                if(list(counter) > EmptyCase) {
+                    //val case = list(counter) - EmptyCase //Nombre de case à colorier -> 6 - 2 = 4 bloc à colorier
+
+                    for(k <- counter until list(counter)) {
+                      if(k < EmptyCase) {
+                        //matrix(i)(k) = 0
+                        counter = counter + 1
+                      } else {
+                        matrix(k)(i) = 1 
+                        counter = counter + 1
+                      } 
+                    }
+                }
+            }
         }
-      }
-    } else {
-      var counter = 0
-      var index = 0
-
-      if (rowList(counter) > emptyCase) {
-        for (k <- counter until rowList(counter)) {
-          if (k < emptyCase) {
-            // matrix = matrix.updated(rowIndex, matrix(rowIndex).updated(k, 0))
-            counter = counter + 1
-          } else {
-            matrix = matrix.updated(rowIndex, matrix(rowIndex).updated(k, 1))
-            counter = counter + 1
-          }
+        println("J'essaye de print la matrice start:")
+        for (i <- 0 until matrix.length) {
+          for (j <- 0 until matrix(i).length) {
+          print(matrix(i)(j) + " ")
+          } 
+          println()
         }
-      }
+        true
     }
-  }
-
-  // ... (Votre code inchangé jusqu'à la deuxième boucle for)
-
-  for ((colList, colIndex) <- colIndices.zipWithIndex) {
-    val indicesSum = colList.sum
-    val indicesCases = indicesSum + (colList.length - 1)
-    val emptyCase = matrix.length - indicesCases
-
-    if (emptyCase == 0) {
-      var counter = 0
-      var k = 0
-      var skip = false
-      matrix = matrix.updated(0, matrix(0).updated(colIndex, 1))
-      for (i <- 0 until matrix.length) {
-        if (skip) {
-          skip = false
-        } else {
-          matrix = matrix.updated(i, matrix(i).updated(colIndex, 1))
-          counter = counter + 1
-
-          if (counter == colList(k) && i + 1 != matrix.length) {
-            matrix = matrix.updated(i + 1, matrix(i + 1).updated(colIndex, 2))
-            counter = 0
-            k = k + 1
-            skip = true
-          }
-        }
-      }
-    } else {
-      var counter = 0
-      var index = 0
-
-      if (colList(counter) > emptyCase) {
-        for (k <- counter until colList(counter)) {
-          if (k < emptyCase) {
-            // matrix = matrix.updated(k, matrix(k).updated(colIndex, 0))
-            counter = counter + 1
-          } else {
-            matrix = matrix.updated(k, matrix(k).updated(colIndex, 1))
-            counter = counter + 1
-          }
-        }
-      }
-    }
-  }
-
-  println("J'essaye de print la matrice start:")
-  for (i <- 0 until matrix.length) {
-    for (j <- 0 until matrix(i).length) {
-      print(matrix(i)(j) + " ")
-    }
-    println()
-  }
-  true
-}
-
-
-
-
-
 
 
 
@@ -206,10 +210,14 @@ def start(rowIndices: List[List[Int]], colIndices: List[List[Int]], matrix: List
     //val colIndicess = List(List(10,1), List(4), List(2), List(3), List(1),List(3), List(4), List(2), List(3), List(1),List(3), List(4), List(2), List(3), List(1))
     //val rowIndicess = List(List(2), List(2), List(4), List(3), List(2),List(3), List(4), List(2), List(3), List(1),List(3), List(4), List(2), List(3), List(1))
     
-    val colIndicess = List(List(3), List(3), List(2), List(3), List(2))
-    val rowIndicess = List(List(1), List(2), List(2,2), List(3), List(3))
+    //val colIndicess = List(List(3), List(3), List(2), List(3), List(2))
+    //val rowIndicess = List(List(1), List(2), List(2,2), List(3), List(3))
 
-    val matrix: List[List[Int]] = List.fill(5)(List.fill(5)(0))
+    val colIndicess = List(List(3), List(3), List(2), List(3), List(2), List(3), List(3), List(2), List(3), List(2))
+    val rowIndicess = List(List(6,1), List(2), List(2,2), List(3), List(3), List(1), List(2), List(2,2), List(3), List(3))
+
+    //val matrix: List[List[Int]] = List.fill(5)(List.fill(5)(0))
+    val matrix: Array[Array[Int]] = Array.ofDim[Int](10, 10)
 
     println("Je print la taille de rowIndices et colIndices" + rowIndicess.length + colIndicess.length)
     start(rowIndicess, colIndicess, matrix)
@@ -220,14 +228,13 @@ def start(rowIndices: List[List[Int]], colIndices: List[List[Int]], matrix: List
         println(s"Combinations for the row $rowIndicess(i) of size 5:")
         combinations.foreach(combination => println(combination.mkString(" ")))
     }*/
-    //val row = List(2)
-    //val size = 5
+    val row = List(6,1)
+    val size = 10
 
-    //val combinations = produceCombinations(row, size, matrix(1))
+    val combinations = produceCombinations(row, size, matrix(1).toList)
 
-    /*println(s"Combinations for the row $row of size $size:")
+    println(s"Combinations for the row $row of size $size:")
     combinations.foreach(combination => println(combination.mkString(" ")))
-    println("Je print combination " + combinations.mkString(" "))
-    println("Je print combination " + combinations)*/
+  
   }
 }

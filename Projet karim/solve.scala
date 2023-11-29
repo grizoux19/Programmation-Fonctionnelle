@@ -1,7 +1,8 @@
 import scala.io.Source
 import scala.annotation.tailrec
-import Gpossib._
 import MatrixProcessor._
+import Gpossib._
+
 
 object solver {
 
@@ -13,8 +14,7 @@ object solver {
   val numRows = rowHints.length
   val numCols = colHints.length
 
-  
-  val initialBoard = generateBoardCombinations(numCols, rowHints, colHints)
+  val initialBoard = generateBoardCombinations(colHints, rowHints)
 
   def solveRec(board: Board, rowIndex: Int): Option[Board] = {
     if (rowIndex == numRows) {
@@ -26,7 +26,7 @@ object solver {
         None
       }
     } else {
-      val rowPossibilities = generatePossibilities(numCols, rowHints(rowIndex)) //Generate possibilities
+      val rowPossibilities = generatePossibilities(numCols, rowHints(rowIndex), firstGrid(rowIndex)) //Besoin de Gposs
       val updatedBoard = rowPossibilities.foldLeft(Option.empty[Board]) { (acc, possibility) =>
         acc.orElse {
           val newBoard = updateBoardRow(board, rowIndex, possibility)
@@ -48,29 +48,45 @@ object solver {
   solveRec(initialBoard, 0)
 }
 
-  def generateBoardCombinations(size: Int, rowHints: List[Row], colHints: List[Col]): Board = {
+
+  def generateBoardCombinations(colHints: List[Col], rowHints: List[Row]): Board = {
     val numRows = rowHints.size
-    val numCols = size
-    
-    //Initialisé Start ici
+    val numCols = colHints.size
 
     //val emptyBoard: Board = List.fill(numRows)(List.fill(numCols)(false))
+    //draw(emptyBoard)
 
-    val emptyBoard = Array.ofDim[Int](numRows, numCols)
-    val startBoard = start(rowHints, colHints, emptyBoard)
+    val firstGrid = start(rowHints, colHints, Array.ofDim[Int](numRows, numCols))
+    //firstGrid contient les premiers 1 qui ne peuvent pas bouger
 
-    draw(startBoard)
-
-    val rowPossibilities = rowHints.map(hints => produceCombinations(numCols, hints).head)
+    //val rowPossibilities = rowHints.map(hints => generatePossibilities(hints, numCols, firstGrid).head) //Besoin de Gposs
+    val rowPossibilities = rowHints.zip(firstGrid).map {
+      case (hints, firstGridRow) =>
+        generatePossibilities(hints, numCols, firstGridRow).head
+    }
 
     rowPossibilities.zipWithIndex.foldLeft(emptyBoard) {
-    case (board, (possibility, rowIndex)) =>
-      updateBoardRow(board, rowIndex, possibility)
-
+      case (board, (possibility, rowIndex)) =>
+        updateBoardRow(board, rowIndex, possibility)
+    }
   }
-}
 
-  def start(rowIndices: List[List[Int]], colIndices: List[List[Int]], matrix: Array[Array[Int]]): List[List[Int]] = { //Fonction pour remplir les hint plus grand que la moitié
+  // Fonction pour mettre à jour une ligne de la matrice avec une possibilité donnée
+  def updateBoardRow(board: Board, rowIndex: Int, rowPossibility: List[Int]): Board = {
+    board.zipWithIndex.map {
+      case (row, index) =>
+        if (index == rowIndex) {
+          row.zipWithIndex.map {
+            case (_, colIndex) =>
+              rowPossibility(colIndex) == 1
+          }
+        } else {
+          row
+        }
+    }
+  }
+
+    def start(rowIndices: List[List[Int]], colIndices: List[List[Int]], matrix: Array[Array[Int]]): Boolean = { //Fonction pour remplir les hint plus grand que la moitié
       for (i <- 0 until rowIndices.length) { //Pour chaque ligne
           val list = rowIndices(i) //Liste des indices de la lignes
           //println("Je print la liste : " + list.length)
@@ -177,34 +193,18 @@ object solver {
         } 
         println()
       }
-      val matrixAsList: List[List[Int]] = matrix.map(_.toList).toList
-      matrixAsList
-  }
-
-  // Fonction pour mettre à jour une ligne de la matrice avec une possibilité donnée
-  def updateBoardRow(board: Board, rowIndex: Int, rowPossibility: List[Int]): Board = {
-    board.zipWithIndex.map {
-      case (row, index) =>
-        if (index == rowIndex) {
-          row.zipWithIndex.map {
-            case (_, colIndex) =>
-              rowPossibility(colIndex) == 1
-          }
-        } else {
-          row
-        }
+      true
     }
-  }
 
 
     def draw(board: Board): Unit = {
-  board.foreach { row =>
-    row.foreach { cell =>
+      board.foreach { row =>
+      row.foreach { cell =>
       print(if (cell) "■ " else "□ ")
-    }
-    println()
-  }
-  }
+      }
+      println()
+      }
+    } 
 
   def verif(board: Board, rowHints: List[Row], colHints: List[Col]): Boolean = {
     val colind = calculateColIndices(board)
@@ -220,17 +220,17 @@ object solver {
   def main(args: Array[String]): Unit = {
 
 
-val rowHints: List[Row] = List(List(2), List(5),List(5),List(1),List(1,1),List(1,1,1),List(1,2),List(4),List(2),List(5))
+    val rowHints: List[Row] = List(List(2), List(5),List(5),List(1),List(1,1),List(1,1,1),List(1,2),List(4),List(2),List(5))
 
-val colHints: List[Col] = List(List(2,3,1), List(3,1,1), List(3,2,1,1),List(2,4),List(3,5))
+    val colHints: List[Col] = List(List(2,3,1), List(3,1,1), List(3,2,1,1),List(2,4),List(3,5))
 
 
-val numRows = rowHints.length
-val numCols = colHints.length
+    val numRows = rowHints.length
+    val numCols = colHints.length
 
-solve(rowHints,colHints)
+    solve(rowHints,colHints)
 
-}
+  }
 }
 
   

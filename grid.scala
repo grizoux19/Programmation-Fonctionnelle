@@ -54,13 +54,17 @@ object NonogramSolver {
     println("Indices des colonnes : " + colIndices)
 
 
-    val colIndicess = List(List(10), List(10), List(2), List(2), List(10), List(10), List(2), List(2), List(10), List(10))
-    val rowIndicess = List(List(2,2,2), List(2,3,2), List(2,3,3), List(2,2,3), List(2,2,2), List(3,2,2), List(3,3,2), List(2,3,2), List(2,2,2), List(2,2,2))
+    //val colIndicess = List(List(10), List(10), List(2), List(2), List(10), List(10), List(2), List(2), List(10), List(10))
+    //val rowIndicess = List(List(2,2,2), List(2,3,2), List(2,3,3), List(2,2,3), List(2,2,2), List(3,2,2), List(3,3,2), List(2,3,2), List(2,2,2), List(2,2,2))
+    /*
+    val colHints: List[List[Int]] = List(List(2,1),List(3),List(3),List(1),List(1,3),List(1,3),List(3),List(1,1),List(2),List(2))
 
-    println("Je print la taille de rowIndices et colIndices" + rowIndicess.length + colIndicess.length)
-    val boolean = calculateSolution(rowIndicess, colIndicess)
+    val rowHints: List[List[Int]] = List(List(1,6), List(2,1,2), List(2,3,1),List(3,2,1),List(1,2))
+
+    //println("Je print la taille de rowIndices et colIndices" + rowIndicess.length + colIndicess.length)
+    val boolean = calculateSolution(rowHints, colHints)
     println("Solutionnnnn : " + boolean)
-
+    */
   }
 }
 
@@ -74,15 +78,15 @@ object NonogramSolver {
       Array(0, 0, 0, 0, 0)
     )*/
 
-    val matrix = Array.ofDim[Int](10, 10) // Matrice 10x10 initialisée à zéro
+    val matrix = Array.ofDim[Int](rowIndices.length, colIndices.length) // Matrice 10x10 initialisée à zéro
 
     start(rowIndices, colIndices, matrix)//Fonction pour remplir les hint plus grand que la moitié
 
-    begin(rowIndices, colIndices, matrix)//Remplir de cases sur la première cases est coloriée
+    //begin(rowIndices, colIndices, matrix)//Remplir de cases sur la première cases est coloriée
 
-    border(rowIndices, colIndices, matrix) //Fonction pour mettre des croix la ou c'est pas possible
+    //border(rowIndices, colIndices, matrix) //Fonction pour mettre des croix la ou c'est pas possible
 
-    thenn(rowIndices, colIndices, matrix)//Fonction pour remplir les 0
+    //thenn(rowIndices, colIndices, matrix)//Fonction pour remplir les 0
     //Fonction pour partir des bords et écrire des cases
 
     //Fonction pour mettre des croix la ou c'est pas possible
@@ -90,28 +94,28 @@ object NonogramSolver {
     def start(rowIndices: List[List[Int]], colIndices: List[List[Int]], matrix: Array[Array[Int]]): Boolean = { //Fonction pour remplir les hint plus grand que la moitié
         for (i <- 0 until rowIndices.length) { //Pour chaque ligne
             val list = rowIndices(i) //Liste des indices de la lignes
-            //println("Je print la liste : " + list.length)
-            //println("Je print rowIndices : " + rowIndices(i))
+            println("Je print la liste : " + list.length)
+            println("Je print rowIndices : " + rowIndices(i))
 
             val IndicesSum = list.sum //Somme des indices de la ligne
             val IndicesCases = IndicesSum + (list.length - 1)
-            val EmptyCase = rowIndices.length - IndicesCases //Nombre de cases vides dans la ligne
+            val EmptyCase = colIndices.length - IndicesCases //Nombre de cases vides dans la ligne
 
-            //println("Je print la somme des indices : " + EmptyCase)
+            println("Je print la somme des indices : " + EmptyCase)
 
             if(EmptyCase == 0) {
                 var counter = 0
                 var k = 0
                 var skip = false
-                for (j <- 0 until rowIndices.length) {
+                for (j <- 0 until colIndices.length) {
                     if(skip) {
                       skip = false
                     } else {
                       matrix(i)(j) = 1
                       counter = counter + 1
 
-                      if(counter == list(k) && j + 1 != rowIndices.length) {
-                          matrix(i)(j+1) = 2
+                      if(counter == list(k) && j + 1 != colIndices.length) {
+                          matrix(i)(j+1) = 0 //anciennement 2 -> croix
                           counter = 0
                           k = k + 1
                           skip = true
@@ -136,7 +140,7 @@ object NonogramSolver {
                     }
                 }
             }
-        }////
+        }/// //Quand je cache le code avant j'obtiens que des zéros
 
         for (i <- 0 until colIndices.length) { //Pour chaque ligne
             val list = colIndices(i) //Liste des indices de la lignes
@@ -145,7 +149,7 @@ object NonogramSolver {
 
             val IndicesSum = list.sum //Somme des indices de la ligne
             val IndicesCases = IndicesSum + (list.length - 1)
-            val EmptyCase = colIndices.length - IndicesCases //Nombre de cases vides dans la ligne
+            val EmptyCase = rowIndices.length - IndicesCases //Nombre de cases vides dans la ligne
 
             //println("Je print la somme des indices : " + EmptyCase)
 
@@ -153,15 +157,15 @@ object NonogramSolver {
                 var counter = 0
                 var k = 0
                 var skip = false
-                for (j <- 0 until colIndices.length) {
+                for (j <- 0 until rowIndices.length) {
                     if(skip) {
                       skip = false
                     } else {
                       matrix(j)(i) = 1
                       counter = counter + 1
 
-                      if(counter == list(k) && j + 1 != colIndices.length) {
-                          matrix(j+1)(i) = 2
+                      if(counter == list(k) && j + 1 != rowIndices.length) {
+                          matrix(j+1)(i) = 0 // anciennet 2 -> croix 
                           counter = 0
                           k = k + 1
                           skip = true
