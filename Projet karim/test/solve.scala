@@ -50,28 +50,23 @@ object solver {
   }
 
   solveRec(initialBoard, 0)
-}
+ }
 
 
 
 
-   def generateBoardCombinations(size: Int, rowHints: List[Row]): Board = {
-  val numRows = rowHints.size
-  val numCols = size
+  def generateBoardCombinations(size: Int, rowHints: List[Row]): Board = {
+    val numRows = rowHints.size
+    val numCols = size
     val emptyBoard: Board = List.fill(numRows)(List.fill(numCols)(false))
-  draw(emptyBoard)
-  val rowPossibilities = rowHints.map(hints => generatePossibilities(numCols, hints).head) // Tablezu qui contient les première possibilité
+    draw(emptyBoard)
+    val rowPossibilities = rowHints.map(hints => generatePossibilities(numCols, hints).head) // Tablezu qui contient les première possibilité
 
-
-
-  rowPossibilities.zipWithIndex.foldLeft(emptyBoard) { //Ecrit rowpossibilities dans 
-    case (board, (possibility, rowIndex)) =>
+    rowPossibilities.zipWithIndex.foldLeft(emptyBoard) { //Ecrit rowpossibilities dans 
+      case (board, (possibility, rowIndex)) =>
       updateBoardRow(board, rowIndex, possibility)
-
+    }
   }
-}
-
-  
 
   // Fonction pour mettre à jour une ligne de la matrice avec une possibilité donnée
   def updateBoardRow(board: Board, rowIndex: Int, rowPossibility: List[Int]): Board = {
